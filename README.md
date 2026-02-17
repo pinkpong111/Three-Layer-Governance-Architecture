@@ -42,16 +42,16 @@ Governance is distributed across three structural levels.
 
 ```
 ┌─────────────────────────────────────────────┐
-│         TOP LAYER — Invariant Governance     │
-│  Define boundaries · Validate integrity      │
-│  Rarely intervene · Maintain invariants      │
+│         TOP LAYER — Invariant Governance    │
+│  Define boundaries · Validate integrity     │
+│  Rarely intervene · Maintain invariants     │
 ├─────────────────────────────────────────────┤
-│      MIDDLE LAYER — Resolution Mediation     │
-│  Detect conflict · Translate abstraction     │
-│  Prevent misclassification · Stage correction│
+│      MIDDLE LAYER — Resolution Mediation    │
+│  Detect conflict · Translate abstraction    │
+│ Prevent misclassification · Stage correction│
 ├─────────────────────────────────────────────┤
-│      BOTTOM LAYER — Operational Diversity    │
-│  Local exploration · Task specialization     │
+│      BOTTOM LAYER — Operational Diversity   │
+│  Local exploration · Task specialization    │
 │  Adapt to environment · Preserve autonomy   │
 └─────────────────────────────────────────────┘
 ```
@@ -79,12 +79,12 @@ Governance distinguishes between three types of structural distortion.
 │  Boundary or structural rule corruption  │
 ├──────────────────────────────────────────┤
 │  Metadata Distortion                     │  ← Middle Layer
-│  Interpretation mismatch,               │
-│  threshold miscalibration,              │
-│  protocol misalignment                  │
+│  Interpretation mismatch,                │
+│  threshold miscalibration,               │
+│  protocol misalignment                   │
 ├──────────────────────────────────────────┤
 │  Data Distortion                         │  ← Bottom Layer
-│  Raw operational deviation              │
+│  Raw operational deviation               │
 └──────────────────────────────────────────┘
                     │
                     ▼  Purification
@@ -100,7 +100,7 @@ Governance operates through staged intervention.
 
 ```
   ┌────────┐    ┌─────────┐    ┌───────────────┐    ┌────────────────┐    ┌─────────────┐
-  │  MARK  │ → │ CONTAIN │ → │ SOFT CORRECT  │ → │ HARD CORRECT   │ → │ RE-ALIGN    │
+  │  MARK  │ →  │ CONTAIN │ →  │ SOFT CORRECT  │ →  │ HARD CORRECT   │ →  │ RE-ALIGN    │
   └────────┘    └─────────┘    └───────────────┘    └────────────────┘    └─────────────┘
   Divergence    Boundary       Reflective signal     Resource restriction  Projection back
   detected      tightened      injected              or rollback           to stable space
@@ -115,6 +115,39 @@ The system does not eliminate instability. It **structures its resolution**.
 Central mediation must not become a bottleneck. Therefore, each agent develops an internal mediation layer, central mediation frequency decreases over time, and governance shifts from active control to supervisory validation.
 
 Autonomy increases as internal stability improves.
+
+### 6.1 Seed Mediation — Fractal Propagation of Governance
+
+The internal mediation layer is not a compressed copy of the central mediation layer.  
+It is a **generative seed** — the minimal set of rules from which each agent can grow its own mediation structure.
+
+```
+Central Mediation Layer
+        │
+        │  extracts common generative rules
+        ▼
+  [ Generative Seed ]  ◄── shared across all agents
+        │
+        ├──► Agent A  grows mediation layer shaped by its own environment
+        ├──► Agent B  grows mediation layer shaped by its own environment
+        └──► Agent C  grows mediation layer shaped by its own environment
+```
+
+**What the seed contains:**  
+The common structural rules — escalation logic, distortion detection pattern, correction directionality — that hold regardless of agent type.
+
+**What the seed does not contain:**  
+Agent-specific thresholds, specialization parameters, and local adaptation patterns. These are left to each agent's learning process.
+
+> The seed does not prescribe the final form.  
+> It prescribes the growth rules.
+
+This is why diversity and stability can coexist:  
+**Stability** is guaranteed by the shared seed (common generative invariant).  
+**Diversity** emerges from each agent's growth environment.
+
+Traditional governance propagates rules **top-down**.  
+This architecture propagates seeds — rules **germinate** rather than descend.
 
 ---
 
