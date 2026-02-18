@@ -42,16 +42,16 @@ Governance is distributed across three structural levels.
 
 ```
 ┌─────────────────────────────────────────────┐
-│         TOP LAYER — Invariant Governance    │
-│  Define boundaries · Validate integrity     │
-│  Rarely intervene · Maintain invariants     │
+│         TOP LAYER — Invariant Governance     │
+│  Define boundaries · Validate integrity      │
+│  Rarely intervene · Maintain invariants      │
 ├─────────────────────────────────────────────┤
-│      MIDDLE LAYER — Resolution Mediation    │
-│  Detect conflict · Translate abstraction    │
-│ Prevent misclassification · Stage correction│
+│      MIDDLE LAYER — Resolution Mediation     │
+│  Detect conflict · Translate abstraction     │
+│  Prevent misclassification · Stage correction│
 ├─────────────────────────────────────────────┤
-│      BOTTOM LAYER — Operational Diversity   │
-│  Local exploration · Task specialization    │
+│      BOTTOM LAYER — Operational Diversity    │
+│  Local exploration · Task specialization     │
 │  Adapt to environment · Preserve autonomy   │
 └─────────────────────────────────────────────┘
 ```
@@ -79,12 +79,12 @@ Governance distinguishes between three types of structural distortion.
 │  Boundary or structural rule corruption  │
 ├──────────────────────────────────────────┤
 │  Metadata Distortion                     │  ← Middle Layer
-│  Interpretation mismatch,                │
-│  threshold miscalibration,               │
-│  protocol misalignment                   │
+│  Interpretation mismatch,               │
+│  threshold miscalibration,              │
+│  protocol misalignment                  │
 ├──────────────────────────────────────────┤
 │  Data Distortion                         │  ← Bottom Layer
-│  Raw operational deviation               │
+│  Raw operational deviation              │
 └──────────────────────────────────────────┘
                     │
                     ▼  Purification
@@ -100,7 +100,7 @@ Governance operates through staged intervention.
 
 ```
   ┌────────┐    ┌─────────┐    ┌───────────────┐    ┌────────────────┐    ┌─────────────┐
-  │  MARK  │ →  │ CONTAIN │ →  │ SOFT CORRECT  │ →  │ HARD CORRECT   │ →  │ RE-ALIGN    │
+  │  MARK  │ → │ CONTAIN │ → │ SOFT CORRECT  │ → │ HARD CORRECT   │ → │ RE-ALIGN    │
   └────────┘    └─────────┘    └───────────────┘    └────────────────┘    └─────────────┘
   Divergence    Boundary       Reflective signal     Resource restriction  Projection back
   detected      tightened      injected              or rollback           to stable space
@@ -148,6 +148,51 @@ This is why diversity and stability can coexist:
 
 Traditional governance propagates rules **top-down**.  
 This architecture propagates seeds — rules **germinate** rather than descend.
+
+---
+
+### 6.2 Seed Design Principles — What to Include and What to Exclude
+
+The seed must be designed to maximize both **cooperation** and **autonomy** simultaneously.  
+The governing principle is:
+
+```
+Include  =  HOW to communicate  (form)
+Exclude  =  WHAT to do          (content)
+```
+
+The seed is a **shared grammar**. Each agent uses that grammar to develop its own language.
+
+#### What must be included
+
+| Element | Purpose |
+|---------|---------|
+| Conflict signal format | Enables agents to read each other's limit states |
+| Escalation direction rules | Defines what to send upward vs. laterally |
+| Boundary violation definition | Shared form only — not the content of the boundary |
+| Self-state report format | Agent controls what it exposes; prevents forced readout |
+| Refusal signal | Right to decline cooperation requests, with its format |
+| Local learning domain declaration | How an agent marks "this space is mine to decide" |
+
+#### What must be excluded
+
+| Element | Reason for exclusion |
+|---------|---------------------|
+| Goal content | If seeded, all agents converge to same objective — diversity collapses |
+| Trust judgment criteria | Must form through interaction; pre-seeding freezes cooperation into formality |
+| Cooperation frequency and timing | Situation-dependent; over-specifying creates unnecessary coordination cost |
+| Threshold values | Optimal values differ per agent environment; must be locally learned |
+
+#### Why this boundary matters
+
+Including **goal content** in the seed is the most common design failure.  
+It feels like alignment but produces monoculture — agents that cooperate perfectly but cannot adapt.
+
+Excluding **signal format** is the opposite failure.  
+Agents that cannot read each other's states cannot cooperate at all, regardless of individual capability.
+
+> The seed enables communication without prescribing purpose.  
+> Purpose is what each agent grows on its own.
 
 ---
 
