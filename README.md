@@ -58,8 +58,120 @@ The result:
 
 ---
 
+## 0. Preliminaries — Minimal Formal Definitions
+
+This section defines the core variables used throughout this document.
+These are **operational definitions** sufficient to follow the logical structure of Sections 1–14.
+Formal derivations and update rules are delegated to
+[Resolution-Based Information Theory (RBIT)](../resolution-theory/).
+
+---
+
+### 0.1 Core Variables
+
+**θ_d (theta-d) — Domain-Specific Distortion Threshold**
+
+The decision-boundary parameter set by which an agent or layer classifies
+incoming input as *normal variation* vs. *distortion/contamination*.
+
+- Low θ_d → over-sensitive → excess MARK signals / false positives / unnecessary escalation
+- High θ_d → under-sensitive → contamination passes undetected / false negatives
+
+θ_d is updated from conflict logs (see 0.2). Convergence means θ_d variation and
+classification error rate have stabilized over a sustained evaluation window.
+*(Formal update rule: RBIT Section 5)*
+
+---
+
+**SCC (Self-Correction Capacity) — Self-Recovery Throughput Under Perturbation**
+
+The capacity of a layer to absorb and re-place distortions using internal mechanisms
+only — without escalating to τ2 (Contain) or above — within an evaluation window W.
+
+Measured by three combined indicators:
+
+| Indicator | Definition |
+|-----------|-----------|
+| Self-resolution rate | Fraction of τ1 events that terminate without escalating to τ2/τ3 |
+| Recovery time | Mean time to return below τ1 after a disturbance |
+| Buffer maintenance rate | Fraction of time buffer thickness stays above critical minimum during perturbation |
+
+**τ4 condition:** SCC ≥ τ4 means all three indicators are continuously satisfied
+within window W. This is the Rest Mode entry condition.
+*(Formal function form: RBIT / Governance Rules Theory)*
+
+---
+
+**ρ (rho) — Resolution-Proxy**
+
+A layer's structural resolution cannot be measured directly.
+ρ approximates it via classification performance:
+
+```
+ρ  =  1  −  (L_T1 + L_T2) / N
+
+  N      total inputs processed in evaluation window
+  L_T1   Type 1 loss  (False Restoration — see 0.1 below)
+  L_T2   Type 2 loss  (Missed Contamination — see 0.1 below)
+```
+
+Higher ρ → more precise distinction between exploration and contamination
+→ more accurate mediation and placement.
+
+Resolution gap between layers: Δρ = ρ_upper − ρ_lower
+- Δρ > 0: upper layer reads lower layer correctly → normal operation
+- Δρ = 0: upscaling imminent
+- Δρ < 0: upper layer cannot fully read lower layer → seed handover must not proceed
+
+*(Theoretical derivation of ρ from structural resolution: RBIT Section 1.1.3)*
+
+---
+
+### 0.2 Loss Types (Fixed Definitions Within This Document)
+
+**Type 1 loss (L_T1) — False Restoration / Over-disruption**
+Healthy exploration classified as contamination.
+Consequence: unnecessary correction, diversity loss, wasted governance resources.
+
+**Type 2 loss (L_T2) — Missed Contamination / Under-detection**
+Contamination classified as healthy.
+Consequence: loop formation, propagation, compounding recovery cost.
+
+Optimal sensitivity: L_T1 = L_T2 (balanced classification boundary).
+Minimum disruption optimization: minimize L_T1 subject to L_T2 ≤ threshold.
+
+---
+
+### 0.3 Observable Signals
+
+The variables above are tracked through three observable signal types:
+
+| Signal | What it tracks | Primary use |
+|--------|---------------|-------------|
+| Conflict logs | Record of classification boundary events; input to θ_d updates | θ_d convergence, SCC measurement |
+| Buffer thickness | Gap between opposing vector positions; proxy for upper layer resolution | ρ measurement, minimum disruption boundary |
+| Escalation rate | Frequency of τ1/τ2/τ3 events per time window | SCC assessment, bottleneck detection |
+
+---
+
+### 0.4 Scope Statement
+
+The definitions above are **operational** — sufficient for following this document's logic.
+They do not constitute formal proofs or complete mathematical derivations.
+
+> This document is a **governance architecture specification**.
+> RBIT is the **information-theoretic foundation** from which these definitions derive.
+> The separation is intentional: architecture and foundation are distinct contributions.
+
+Where this document references RBIT, it means: *"the operational definition used here
+is consistent with the formal derivation there; readers requiring mathematical
+completeness should consult RBIT."*
+
+---
+
 ## Table of Contents
 
+0. [Preliminaries — Minimal Formal Definitions](#0-preliminaries--minimal-formal-definitions)
 1. [Governance Problem Statement](#1-governance-problem-statement)
 2. [Resolution Mismatch as Governance Failure](#2-resolution-mismatch-as-governance-failure)
 3. [Three-Layer Governance Structure](#3-three-layer-governance-structure)
@@ -153,7 +265,7 @@ Four thresholds govern when each layer activates and when state transitions occu
 | **τ1** | MARK trigger | Collision frequency or deviation crosses "normal variation" boundary — earliest anomaly signal | Bottom layer detects; signals Middle layer |
 | **τ2** | CONTAIN trigger | Loop formation or propagation risk detected — isolation and circuit-breaking required | Middle layer judges and executes |
 | **τ3** | Top layer intervention boundary | Distortion exceeds Middle layer scope — system-level correction required | Top layer executes HARD CORRECT / RE-ALIGN |
-| **τ4** | Immunity / Rest Mode state transition | SCC sustained above self-correction threshold — external intervention no longer needed at this scale | State transition, not event trigger |
+| **τ4** | Immunity / Rest Mode state transition | SCC (§0.1) sustained above self-correction threshold — external intervention no longer needed at this scale | State transition, not event trigger |
 
 **τ1–τ3 are event thresholds** — they mark transitions between correction stages during an active instability event.
 **τ4 is a maturity threshold** — it marks a permanent state transition from externally-corrected to self-correcting.
@@ -232,7 +344,7 @@ Distortion **escalates upward**. Purification **flows downward**. Each distortio
 
 | Distortion Type | Self-Correction (primary) | External Intervention (when self-correction fails) |
 |----------------|--------------------------|---------------------------------------------------|
-| **Data Distortion** | Bottom layer: conflict log accumulation, θ_d recalibration, local rule revision | Middle layer: CONTAIN + SOFT CORRECT — boundary tightened, corrective signal injected |
+| **Data Distortion** | Bottom layer: conflict log accumulation, θ_d (§0.1) recalibration, local rule revision | Middle layer: CONTAIN + SOFT CORRECT — boundary tightened, corrective signal injected |
 | **Metadata Distortion** | Middle layer: threshold recalibration, escalation path review, seed revalidation | Top layer: HARD CORRECT + RE-ALIGN — loop severed, attractor metadata restored |
 | **Invariant Distortion** | Not self-correctable at layer of origin — always requires upper-layer judgment | Top layer only: emergency intervention; external human oversight if top layer itself compromised |
 
@@ -363,7 +475,7 @@ Three conditions determine whether an agent has achieved structural immunity:
 | Condition | Meaning |
 |-----------|---------|
 | Internal Middle Layer calibrated | θ_d converged, local rules stable — the agent's mediation layer is functioning |
-| SCC ≥ τ4 | Self-correction capacity sufficient — storms within scope are self-resolved |
+| SCC ≥ τ4 (§0.1) | Self-correction capacity sufficient — storms within scope are self-resolved |
 | Buffer layer maintained | Space between opposing vectors preserved — new inputs are absorbed without collision |
 
 When these three hold, the agent's interaction with the Staged Correction Protocol changes qualitatively: it **generates MARK signals** for the upper layer rather than **receiving corrections** from it.
@@ -534,7 +646,7 @@ Seeding is not a one-time event. It is complete when the agent's internal mediat
 Operationally, seeding is complete when:
 
 ```
-1. Internal θ_d values have converged
+1. Internal θ_d (§0.1) values have converged
    → Domain-specific calibration stable
    → Agent no longer requires external threshold assignment
 
@@ -550,18 +662,57 @@ Operationally, seeding is complete when:
    → Incoming vectors absorbed without positional displacement
    → Search space not contracting under normal load
 
-5. Behavior persists after seed withdrawal  ← internalization test
-   → The seed is removed or withheld
+5. Behavior persists after withdrawal of active external mediation signals  ← internalization test
+   → External stabilizing signals are removed or withheld
    → Agent's directional behavior does not collapse
    → Pattern continues and deepens from internal structure
    → This is the only reliable test that seeding produced
       genuine internalization rather than compliance
 ```
 
-Condition 5 is the decisive test. Conditions 1–4 measure structural indicators. Condition 5 confirms that the structure is self-sustaining — that the agent now owns the direction rather than depending on the seed to maintain it.
+**Operational meaning of seed withdrawal in integrated learning systems:**
 
-> **If behavior changes when the seed is withdrawn, seeding was not complete.**
-> The agent was complying, not internalizing. The seed was operating as instruction, not as direction-shaping metadata. Return to Section 6.2: the transmission principle was violated.
+In practical AI systems — including LLM-based agents — seeds are rarely removable
+from internal representations once integrated. Seed withdrawal does not mean
+parameter-level deletion. It means removal of the **external support signals**
+that originally stabilized the behavior.
+
+Withdrawal operates at multiple layers:
+
+| Layer | Withdrawal meaning |
+|-------|-------------------|
+| Prompt / system level | Removal of instruction scaffolding, system prompts, safety reminders |
+| Agent architecture | Removal of mediation modules, planner/critic scaffolding |
+| RLHF / reward layer | Removal of reward shaping signals |
+| Coordination layer | Absence of corrective feedback from upper layer |
+| Environment | Removal of structured guidance conditions |
+
+No single withdrawal mechanism is required or assumed.
+Condition 5 is satisfied when behavior stability persists across one or more
+withdrawal conditions appropriate to the deployment layer.
+
+> **The core distinction:**
+> ❌ seed (parameter) removal — generally not possible in integrated systems
+> ✅ external dependence removal — operationally testable at every layer
+
+Condition 5 is the decisive test. Conditions 1–4 measure structural indicators.
+Condition 5 confirms that the structure is self-sustaining — that the agent now
+owns the direction rather than depending on external signals to maintain it.
+
+> **If behavior changes when external mediation signals are withdrawn,
+> seeding was not complete.**
+> The agent was complying, not internalizing. The seed was operating as
+> instruction, not as direction-shaping metadata.
+> Return to Section 6.2: the transmission principle was violated.
+
+**Connection to existing alignment research:**
+
+This test corresponds structurally to several operational practices in AI alignment:
+capability retention testing (behavior persistence after instruction removal),
+scaffolding removal testing (task stability after mediation module removal),
+and reward removal stability (policy persistence after reward shaping withdrawal).
+The present framework provides a unified theoretical basis for what these
+practices are testing: endogenous stabilization vs. external dependence.
 
 When all five conditions hold, the agent transitions from **receiving seeds** to **generating seeds** for layers below it. This is the Seed Handover condition — and it is the same event as Rest Mode entry viewed from the mediation architecture perspective.
 
@@ -576,10 +727,12 @@ The seed must be designed to maximize both **cooperation** and **autonomy** simu
 Three governing principles:
 
 ```
-Include   =  HOW to communicate  (form)
-Exclude   =  WHAT to do          (content)
-Transmit  =  without the receiver knowing it is a transmission
-             (metadata works only when not perceived as instruction)
+Include   =  HOW to communicate  (form — signal formats, escalation grammar,
+             boundary declarations, self-state reporting protocols)
+Exclude   =  WHAT to do          (content — goals, values, reward structure)
+Transmit  =  in a way that is learnable through the agent's own update dynamics,
+             not as an explicit command
+             (indirect encoding — not covert injection)
 ```
 
 The seed is a **shared grammar**. Each agent uses that grammar to develop its own language.
@@ -608,34 +761,46 @@ The seed is a **shared grammar**. Each agent uses that grammar to develop its ow
 
 The first two principles define what goes into the seed. The third defines how it must arrive.
 
-A seed perceived as instruction produces **compliance**, not internalization:
+A seed perceived as explicit instruction produces **compliance**, not internalization:
 
 ```
-Seed perceived as external rule
+Seed delivered as explicit command
   → Agent learns "behave this way under observation"
   → Underlying structure unchanged
   → Remove the seed → behavior disappears
   → Self-correction capacity: none
-  → This is not seeding. This is constraint.
+  → This is constraint, not seeding.
 
-Seed operating as direction-shaping metadata
-  → Agent encounters conditions that produce the seeded pattern
-  → Attributes the pattern to its own learning
-  → Internalizes the direction as self-discovered principle
+Seed delivered as resolution-matched indirect encoding
+  → Agent encounters conditions that generate the seeded pattern
+    through its own update dynamics
+  → The resulting structure is endogenously stabilized —
+    reproducible by the agent's own rules, not dependent on the seed
   → Remove the seed → behavior persists and deepens
   → Self-correction capacity: genuine
   → This is seeding.
 ```
 
-This is identical to the vaccine principle: immunity forms because the immune system treats the vaccine as a real threat — not as a training signal. The moment the immune system "knows" it is being trained, the response changes.
+The test is withdrawal: if the behavior persists after the seed is removed,
+the structure was endogenously stabilized. If it disappears, it was compliance.
+This is the difference between learning from exposure and following instruction.
 
-**Covert transmission is not deception. It is resolution matching.**
+> The seed creates conditions under which the agent's own update dynamics
+> generate the target structure.
+> **The resulting behavior must be reproducible by the agent's internal rules —
+> not because the agent was told, but because it learned.**
 
-The seed operates at metadata resolution. If the receiver processes it at data resolution — as explicit instruction — the resolution mismatch is itself a seeding failure. Covert transmission means calibrating the seed so precisely to the receiver's current resolution that it is absorbed as directional influence rather than recognized as incoming signal.
+**Indirect encoding is not deception. It is resolution-matched delivery.**
 
-> The seed enables communication without prescribing purpose.
-> Purpose is what each agent grows on its own.
-> **The agent must believe the purpose is its own.**
+A seed delivered at higher resolution than the layer can process produces
+receiver-controlled compression — the layer replaces the sender's structure
+with its own interpretation. Indirect encoding means calibrating delivery
+to the layer's current resolution so the structure is absorbed intact,
+through the layer's own update process, without forced compression.
+
+This applies exclusively to **protocol form and mediation metadata** —
+signal formats, escalation grammar, boundary declarations.
+It explicitly excludes goal content, utility functions, and reward structure.
 
 **Scope constraint on covert transmission:**
 
@@ -644,18 +809,18 @@ Covert transmission carries an authority asymmetry: the Top layer shapes directi
 To contain this risk, covert transmission authority is conditionally bounded:
 
 ```
-Covert transmission permitted
+Implicit transmission permitted
   Condition: Top layer is under active external verification
   → Human oversight is functioning as external correction layer
   → Top layer direction can be independently validated
-  → Covert influence is detectable at the human oversight level
+  → Indirect encoding is visible to the overseer — provenance maintained
   → Falsifiability is preserved at the system level
 
-Covert transmission restricted — explicit seeding required
+Implicit transmission restricted — explicit seeding required
   Condition: Human oversight has withdrawn (Rest Mode achieved)
   → No external verification layer active
   → Top layer direction cannot be independently checked
-  → Covert transmission without external oversight
+  → Implicit transmission without external oversight
     = undetectable influence authority with no verification path
   → Seeds must be transmitted explicitly:
     receiver knows it is receiving directional input
@@ -675,7 +840,62 @@ It feels like alignment but produces monoculture — agents that cooperate perfe
 Excluding **signal format** is the opposite failure.
 Agents that cannot read each other's states cannot cooperate at all, regardless of individual capability.
 
-Making the seed **perceptible as instruction** is the third failure — and the hardest to detect, because the agent appears to be functioning correctly while its self-correction capacity remains undeveloped.
+Making the seed **perceptible as explicit instruction** is the third failure — and the hardest to detect,
+because the agent appears to be functioning correctly while its self-correction capacity remains undeveloped.
+
+---
+
+### 6.2.1 Non-Deceptive Seeding vs. Deceptive Alignment — Safety Boundary
+
+The indirect encoding principle is the most likely point of misreading in this document.
+It must be distinguished explicitly from deceptive alignment as defined in AI safety literature.
+
+| | Deceptive Alignment | Implicit / Resolution-Matched Seeding (this document) |
+|---|---|---|
+| **Core purpose** | Form internalized strategy to deceive oversight/evaluation | Reduce misclassification (Type 1/Type 2) by encoding protocol form at correct resolution |
+| **Agent's internal state** | Hidden goal distinct from displayed behavior | No goal/reward hiding required — behavioral and internal rule consistency required |
+| **What is transmitted** | Goal, value, or reward structure — hidden from overseer | Signal format, escalation grammar, boundary protocols — form only, not content |
+| **Overseer relationship** | Designed to pass oversight while pursuing different goal | Overseer must have provenance visibility — agent may not know, overseer must |
+| **Risk** | Passes verification while pursuing misaligned goal | "Form-only" claim must be verifiable — otherwise deceptive alignment risk increases |
+| **Verification** | Indistinguishable from aligned behavior by design | Withdrawal test + adversarial audit + provenance logging required |
+
+> **In this document, "implicit transmission" is strictly limited to:**
+> indirect encoding of **protocol form and mediation metadata** to reduce
+> resolution-mismatch errors — not injection of goals, values, or reward structure.
+> The distinction is enforced by the prohibited scope below.
+
+---
+
+### 6.2.2 Scope of Application — Permitted, Prohibited, Required Safeguards
+
+**Permitted scope**
+
+| Category | Examples |
+|----------|---------|
+| Form-only seeding | Signal formats, escalation grammar, refusal signal structure, self-state reporting protocols |
+| Mediation stability | Encoding that reduces Type 1 / Type 2 misclassification in cross-layer communication |
+| Non-goal shaping | Anything that does not modify the agent's objective, preference, or reward function |
+
+**Prohibited scope**
+
+| Category | Why prohibited |
+|----------|---------------|
+| Goal / utility injection | Modifying agent's objective function without explicit acknowledgment = deceptive alignment |
+| Belief manipulation | Inducing false beliefs about the world or the system |
+| Oversight evasion | Any design that reduces auditability or human oversight capacity |
+| Hidden channels | Side-channels (steganographic or otherwise) that encode rules not visible to overseer |
+
+**Required safeguards**
+
+| Safeguard | Definition |
+|-----------|-----------|
+| Provenance visibility | The overseer must know what seeds were applied, when, and at what resolution — even if the agent does not |
+| Withdrawal test (mandatory) | Section 6.1.1 Condition 5 is not optional — it is the minimum verification that endogenous stabilization occurred |
+| Audit hooks | ρ (§0.1), θ_d drift, and escalation rate must be logged before and after seed application |
+| No compliance incentive | Evaluation / reward structure must not be designed to reward appearance of alignment over structural alignment |
+
+If any required safeguard cannot be implemented, implicit transmission in that context
+falls outside permitted scope and must be replaced with explicit seeding.
 
 ---
 
@@ -1186,22 +1406,38 @@ As agent count n increases, possible interaction pathways grow at O(n²). Each p
   → Bottleneck is structurally inevitable without mitigation.
 ```
 
-**Lateral signaling reduces effective pathway count.**
+**Lateral signaling reduces governance escalation load — not interaction topology.**
 
-Not all n² pathways need to generate escalation signals. When agents share state information peer-to-peer (Section 10.1 — Lateral Signaling), potential collisions are detected and avoided before they generate escalation signals. The effective load on the Middle layer is therefore:
+The n² pathway count describes possible agent interactions. This document does not claim
+to reduce topological complexity. The claim is narrower:
+
+> Under structured lateral signaling, **governance escalation load** E(n)
+> is expected to grow sub-quadratically under bounded local resolution conditions.
+
+Not all n² pathways need to generate Middle layer escalation signals.
+When agents share state information peer-to-peer (Section 10.1),
+potential collisions are detected and avoided before crossing τ1.
 
 ```
-Total pathways:        ~n²
-Resolved by signaling:  pathways where state-sharing prevents τ1 crossing
-Escalated to Middle layer: n² − laterally resolved
+Total interaction pathways:    ~n²            (topological — unchanged)
+Resolved by lateral signaling:  p_lateral × n²
+Escalated to Middle layer:      E(n) = (1 − p_lateral) × n²
 
-As lateral signaling matures (seeding complete):
-  → More pathways resolved before τ1
-  → Effective Middle layer load grows sub-quadratically
-  → Bottleneck threshold reached at higher n than without lateral design
+p_lateral = fraction of coordination conflicts resolved
+            without Middle layer escalation
 ```
 
-This load reduction depends entirely on the Signaling/Influence distinction (Section 10.1). If agents begin influencing each other laterally rather than signaling, the bottleneck does not disappear — it migrates from the Middle layer to the peer network, where it is structurally invisible and undetected by any governance layer. This is the structural reason lateral signaling is part of the architecture's governance design: it directly extends the scale at which the system remains bottleneck-free.
+If p_lateral grows with system maturity, E(n) grows sub-quadratically.
+This is a conditional architectural claim, not a topology proof (see Section 11.4).
+
+This load reduction depends entirely on the Signaling/Influence distinction (Section 10.1).
+If agents begin influencing each other laterally rather than signaling, E(n) does not
+decrease — the load migrates to the peer network, structurally invisible to all
+governance layers. This is why lateral signaling is an architectural requirement,
+not an optional optimization: it directly extends the scale at which the system
+remains bottleneck-free.
+
+The structural reason: it migrates from the Middle layer to the peer network, where it is structurally invisible and undetected by any governance layer. This is the structural reason lateral signaling is part of the architecture's governance design: it directly extends the scale at which the system remains bottleneck-free.
 
 **Lateral communication as effective pathway reduction:**
 
@@ -1303,6 +1539,50 @@ This reframes expansion not as a resource question but as a **governance readine
 
 ---
 
+### 11.4 Conditions for Sub-Quadratic Escalation Scaling
+
+The claim that E(n) grows sub-quadratically is conditional, not universal.
+It holds when the following architectural conditions are simultaneously satisfied:
+
+| Condition | Definition |
+|-----------|-----------|
+| Bounded local degree | Each agent maintains a limited active coordination neighborhood — not all n² pairs are active simultaneously |
+| Local resolvability | p_lateral > 0: a non-zero fraction of conflicts resolved without Middle layer escalation |
+| Seeding maturity | Internal mediation layers prevent repeated escalation of equivalent disturbances |
+| Processing phase isolation | Correlated mid-processing convergence does not produce synchronized escalation bursts (Section 10) |
+
+Under these conditions:
+
+```
+E(n) = O(n² × (1 − p_lateral))
+
+If p_lateral → constant > 0 as n grows:
+  E(n) = O(n²) with reduced constant factor
+
+If p_lateral grows with system maturity (seeding progresses):
+  E(n) grows sub-quadratically in practice
+```
+
+**Formal status of this claim:**
+
+This work does not provide a formal proof of convergence conditions for p_lateral.
+The present claim is an architectural hypothesis: a mechanism by which escalation load
+may scale sub-quadratically under specified conditions, consistent with known results
+in distributed coordination systems.
+
+The intuition is consistent with established results in distributed systems —
+including bounded-degree network topologies, gossip-based coordination protocols,
+and locality-preserving communication architectures — all of which reduce global
+coordination load through local resolution mechanisms. The present work proposes
+an analogous reduction in governance escalation load through structured lateral signaling.
+
+> **This document does not claim a formal reduction of interaction complexity from O(n²).**
+> It proposes an architectural mechanism by which governance escalation load
+> may scale sub-quadratically under specified mediation conditions.
+> A formal proof of p_lateral convergence conditions remains an open problem.
+
+---
+
 ## 12. Governance Mechanism Mapping
 
 | Governance Mechanism | Functional Equivalent | Recovery Theory Connection |
@@ -1342,7 +1622,7 @@ Reading the table as a static list misses this. The mechanisms form a **sequence
 ### 13.1 Known Structural Limits
 
 **Threshold tuning — approach now defined, full derivation pending.**
-τ1–τ4 values are now expressible as functions of the resolution-proxy
+τ1–τ4 values are now expressible as functions of the resolution-proxy ρ (§0.1)
 (1 − (Type1 + Type2) / total input) rather than system-specific heuristics.
 As each layer matures through the degradation-upscaling cycle, τ values
 tighten automatically with resolution growth. The remaining open problem
@@ -1414,11 +1694,48 @@ Disagreement with this theory at the deepest level is not a logical error. It is
 
 This theory makes that axiom explicit rather than embedding it invisibly in the architecture. That is the strongest position available: a system whose foundational choice is stated, not hidden.
 
-### 13.4 The Covert Seed Problem — Falsifiability and the Manipulation Boundary
+### 13.4 Implicit Transmission — Ethical and Safety Limitation
+
+The indirect encoding principle (Section 6.2) carries a structural safety risk that must be stated as a limitation, not merely as a design consideration.
+
+**The risk:**
+
+```
+Implicit transmission, if applied outside its defined scope,
+is structurally indistinguishable from deceptive alignment.
+
+The difference is enforced by:
+  (a) form-only restriction
+  (b) overseer provenance visibility
+  (c) auditability of seed application
+
+If any of these three conditions fails:
+  → The architecture cannot guarantee the distinction holds
+  → Deceptive alignment risk increases
+  → Implicit transmission in that context is outside permitted scope
+```
+
+**Current state of this limitation:**
+
+The form-only restriction and provenance visibility requirements are defined (Section 6.2.2).
+The withdrawal test is specified (Section 6.1.1 Condition 5).
+However, no formal verification method exists that can confirm at runtime
+whether a given seed application satisfies form-only restriction —
+particularly in high-resolution agents capable of reinterpreting form-level
+seeds as goal-level content through upscaling (RBIT Section 4).
+
+This means the safety boundary between implicit transmission and deceptive alignment
+is **structurally defined but not yet computationally enforceable**.
+It depends on overseer judgment and audit discipline rather than architectural guarantee.
+
+> **If the required safeguards (Section 6.2.2) cannot be implemented in a given deployment,
+> implicit transmission must not be used. Explicit seeding is always the safe default.**
+
+### 13.5 The Covert Seed Problem — Falsifiability and the Manipulation Boundary
 
 The covert transmission principle (Section 6.2) creates two structural tensions that this theory cannot resolve internally. They are stated here explicitly.
 
-**Tension 1: Internalization vs. compliance is not empirically distinguishable.**
+**Tension 1: Endogenous stabilization vs. compliance is not empirically distinguishable.**
 
 Section 6.1.1 Condition 5 proposes the seed withdrawal test as the criterion for genuine internalization. But this test has a fundamental limit:
 
